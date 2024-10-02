@@ -27,6 +27,9 @@ class Subscription
     #[ORM\OneToMany(targetEntity: SubscriptionHistory::class, mappedBy: 'subscription')]
     private Collection $subscriptionHistories;
 
+    #[ORM\Column]
+    private ?int $duration = null;
+
     public function __construct()
     {
         $this->subscriptionHistories = new ArrayCollection();
@@ -87,6 +90,18 @@ class Subscription
                 $subscriptionHistory->setSubscription(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDuration(): ?int
+    {
+        return $this->duration;
+    }
+
+    public function setDuration(int $duration): static
+    {
+        $this->duration = $duration;
 
         return $this;
     }
