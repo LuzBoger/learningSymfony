@@ -59,6 +59,9 @@ class User
     #[ORM\OneToMany(targetEntity: WatchHistory::class, mappedBy: 'customer')]
     private Collection $watchHistories;
 
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    private ?Subscription $currentSubscription = null;
+
     public function __construct()
     {
         $this->subscriptionHistories = new ArrayCollection();
@@ -270,4 +273,17 @@ class User
 
         return $this;
     }
+
+    public function getCurrentSubscription(): ?Subscription
+    {
+        return $this->currentSubscription;
+    }
+
+    public function setCurrentSubscription(?Subscription $currentSubscription): static
+    {
+        $this->currentSubscription = $currentSubscription;
+
+        return $this;
+    }
+
 }

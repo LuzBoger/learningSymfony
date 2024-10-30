@@ -9,6 +9,8 @@ use App\Entity\PlaylistMedia;
 use App\Entity\Serie;
 use App\Entity\Subscription;
 use App\Entity\User;
+use App\Enum\MediaStatusEnum;
+use App\Enum\UserAccountStatusEnum;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
@@ -62,6 +64,7 @@ class AppFixtures extends Fixture
         $media->setLongDescription(longDescription: 'Longue description');
         $media->setShortDescription(shortDescription: 'Short description');
         $media->setCoverImage(coverImage: 'http://');
+        $media->setMediaType(MediaStatusEnum::AVAILABLE);
         $media->setReleaseDate(new \DateTimeImmutable('+7 days'));
         $manager->persist(object: $media);
         return $media;
@@ -92,6 +95,7 @@ class AppFixtures extends Fixture
         $user->setEmail(email: "test_{$i}@example.com");
         $user->setUsername(username: "test_{$i}");
         $user->setPassword(password: 'coucou');
+        $user->setAccountStatus(UserAccountStatusEnum::ACTIVE);
         $manager->persist(object: $user);
         return $user;
     }

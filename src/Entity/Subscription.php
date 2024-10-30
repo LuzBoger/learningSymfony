@@ -30,9 +30,16 @@ class Subscription
     #[ORM\Column]
     private ?int $duration = null;
 
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'currentSubscription')]
+    private Collection $users;
+
     public function __construct()
     {
         $this->subscriptionHistories = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -102,6 +109,36 @@ class Subscription
     public function setDuration(int $duration): static
     {
         $this->duration = $duration;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): static
+    {
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+            $user->setCurrentSubscription($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): static
+    {
+        if ($this->users->removeElement($user)) {
+            // set the owning side to null (unless already changed)
+            if ($user->getCurrentSubscription() === $this) {
+                $user->setCurrentSubscription(null);
+            }
+        }
 
         return $this;
     }
