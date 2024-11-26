@@ -1,0 +1,38 @@
+App\Entity\Media:
+  media (template):  # Enlever les parenthèses dans "media(template)"
+    shortDescription: 'short description <sentence()>'
+    longDescription: 'long description <sentence()>'
+    releaseDate: <datetime()>
+    coverImage: 'https://picsum.photos/seed/picsum/300/400'
+    categories:
+      - '@category_action'
+      - '@category_aventure'
+    languages:
+      - '@lang_fr'
+      - '@lang_en'
+
+# Entité 'Movie' qui étend 'media'
+App\Entity\Movie:
+  movie{1..10} (extends media):  # Assurez-vous que le nom correspond bien au modèle
+    title: 'film <current()>'
+
+# Entité 'Serie' qui étend 'media'
+App\Entity\Serie:
+  serie{1..10} (extends media):
+    title: 'Serie <current()>'
+
+# Entité 'Season' pour les séries
+App\Entity\Season:
+  season{1..10}:  # Corriger la clé pour éviter la redondance avec 'serie'
+    number: '<numberBetween(1,10)>'
+    serie: '@serie*'
+
+# Entité 'Episode' pour les épisodes
+App\Entity\Episode:
+  episode{1..100}:
+    title: '<name()>'
+    duration: <numberBetween(30, 120)>
+    # releaseDate: "<datetime()>"
+    # number: '<numberBetween(1,10)>'
+    season: '@season*'
+    releasedAt: '<datetime()>'

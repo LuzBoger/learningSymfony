@@ -14,30 +14,32 @@ class WatchHistory
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $lastWatched = null;
+    private ?\DateTimeImmutable $lastWatchedAt = null;
 
     #[ORM\Column]
     private ?int $numberOfViews = null;
 
     #[ORM\ManyToOne(inversedBy: 'watchHistories')]
-    private ?Media $media = null;
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $watcher = null;
 
     #[ORM\ManyToOne(inversedBy: 'watchHistories')]
-    private ?User $customer = null;
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Media $media = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getLastWatched(): ?\DateTimeImmutable
+    public function getLastWatchedAt(): ?\DateTimeImmutable
     {
-        return $this->lastWatched;
+        return $this->lastWatchedAt;
     }
 
-    public function setLastWatched(\DateTimeImmutable $lastWatched): static
+    public function setLastWatchedAt(\DateTimeImmutable $lastWatchedAt): static
     {
-        $this->lastWatched = $lastWatched;
+        $this->lastWatchedAt = $lastWatchedAt;
 
         return $this;
     }
@@ -54,6 +56,18 @@ class WatchHistory
         return $this;
     }
 
+    public function getWatcher(): ?User
+    {
+        return $this->watcher;
+    }
+
+    public function setWatcher(?User $watcher): static
+    {
+        $this->watcher = $watcher;
+
+        return $this;
+    }
+
     public function getMedia(): ?Media
     {
         return $this->media;
@@ -62,18 +76,6 @@ class WatchHistory
     public function setMedia(?Media $media): static
     {
         $this->media = $media;
-
-        return $this;
-    }
-
-    public function getCustomer(): ?User
-    {
-        return $this->customer;
-    }
-
-    public function setCustomer(?User $customer): static
-    {
-        $this->customer = $customer;
 
         return $this;
     }
