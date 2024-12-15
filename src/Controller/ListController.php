@@ -13,8 +13,16 @@ class ListController extends AbstractController
     #[Route('/lists', name: 'page_lists')]
     public function index(PlaylistRepository $playlistRepository, PlaylistSubscriptionRepository $playlistSubscriptionRepository,): Response
     {
-        $myPlaylists = $playlistRepository->findAll();
-        $mySubscribedPlaylists = $playlistSubscriptionRepository->findAll();
+        $user = $this->getUser();
+
+        // Rediriger si l'utilisateur n'est pas connecté
+        if (!$user) {
+            return $this->redirectToRoute('app_home'); // Remplacez 'app_homepage' par la route de la page d'accueil
+        }
+
+
+        $myPlaylists = $playlistRepository->findBy(['creator' => $user]);
+        $mySubscribedPlaylists = $playlistSubscriptionRepository->findBy(['subscriber' => $user]);
 
         return $this->render('movie/lists.html.twig', [
             'myPlaylists' => $myPlaylists,
