@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Controller;
+
+use App\Repository\PlaylistRepository;
+use App\Repository\PlaylistSubscriptionRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+
+class ListController extends AbstractController
+{
+    #[Route('/lists', name: 'page_lists')]
+    public function index(PlaylistRepository $playlistRepository, PlaylistSubscriptionRepository $playlistSubscriptionRepository,): Response
+    {
+        $myPlaylists = $playlistRepository->findAll();
+        $mySubscribedPlaylists = $playlistSubscriptionRepository->findAll();
+
+        return $this->render('movie/lists.html.twig', [
+            'myPlaylists' => $myPlaylists,
+            'mySubscribedPlaylists' => $mySubscribedPlaylists,
+        ]);
+    }
+}

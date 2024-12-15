@@ -16,7 +16,9 @@ class CategoryController extends AbstractController
     public function category(string $id, CategoryRepository $categoryRepository): Response
     {
         $category = $categoryRepository->find($id);
-        return $this->render('movie/category.html.twig', ['category' => $category]);
+        $categories = $categoryRepository->findAll();
+        dump($category);
+        return $this->render('movie/category.html.twig', ['category' => $category, "categories" => $categories]);
     }
 
     #[Route(path: '/discover', name: 'page_discover')]

@@ -16,6 +16,18 @@ class MovieRepository extends ServiceEntityRepository
         parent::__construct($registry, Movie::class);
     }
 
+    public function findCategoriesForMovie(int $movieId): ?Movie
+    {
+        return $this->createQueryBuilder('m')
+            ->innerJoin('m.categories', 'category') // Utilisez 'm.categories' car Movie hérite de Media
+            ->addSelect('category') // Charger les catégories
+            ->where('m.id = :movieId')
+            ->setParameter('movieId', $movieId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+
     //    /**
     //     * @return Movie[] Returns an array of Movie objects
     //     */

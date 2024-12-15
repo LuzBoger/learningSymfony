@@ -15,6 +15,14 @@ class CategoryRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Category::class);
     }
+    public function findByIdAndTypeFilm($id, $type){
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.id = :id')
+            ->andWhere('c.type = :type')
+            ->setParameter('id', $id)
+            ->setParameter('type', $type)
+            ->getQuery();
+    }
 
     //    /**
     //     * @return Category[] Returns an array of Category objects

@@ -16,6 +16,14 @@ class SubscriptionRepository extends ServiceEntityRepository
         parent::__construct($registry, Subscription::class);
     }
 
+    public function findAllOrderByPriceAsc(): array
+    {
+        return $this->createQueryBuilder('s') // 's' est un alias pour Subscription
+        ->orderBy('s.price', 'ASC')      // Trier par prix (ASC = croissant)
+        ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Subscription[] Returns an array of Subscription objects
     //     */
