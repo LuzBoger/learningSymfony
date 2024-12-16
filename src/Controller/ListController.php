@@ -7,10 +7,12 @@ use App\Repository\PlaylistSubscriptionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ListController extends AbstractController
 {
     #[Route('/lists', name: 'page_lists')]
+    #[IsGranted('ROLE_USER')]
     public function index(PlaylistRepository $playlistRepository, PlaylistSubscriptionRepository $playlistSubscriptionRepository,): Response
     {
         $user = $this->getUser();
