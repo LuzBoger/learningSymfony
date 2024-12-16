@@ -11,10 +11,17 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AuthController extends AbstractController
 {
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
 
     #[Route('/register', name: 'app_register')]
     public function register(): Response
@@ -24,11 +31,50 @@ class AuthController extends AbstractController
         ]);
     }
 
-    #[Route('/reset', name: 'app_reset')]
-    public function reset(): Response
+    #[Route('/reset/{token}', name: 'app_reset')]
+    public function reset(Request $request,
+                          string $token,
+                          UserPasswordHasherInterface $passwordHasher): Response
     {
+// 1. Chercher l'utilisateur avec le token
+        $user = $this->entityManager->getRepository(User::class)->findOneBy(['resetToken' => $token]);
+
+        // 2. Si l'utilisateur n'est pas trouvé, renvoyer une erreur
+        if (!$user) {
+            $this->addFlash('error', 'Jeton de réinitialisation invalide ou expiré.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        // 3. Traiter le formulaire POST
+        if ($request->isMethod('POST')) {
+            $password = $request->request->get('password');
+            $confirmPassword = $request->request->get('confirm_password');
+
+            // Vérifier si les mots de passe sont identiques
+            if ($password !== $confirmPassword) {
+                $this->addFlash('error', 'Les mots de passe ne correspondent pas.');
+                return $this->render('reset.html.twig', [
+                    'token' => $token
+                ]);
+            }
+
+            // 4. Hasher le mot de passe et le sauvegarder
+            $hashedPassword = $passwordHasher->hashPassword($user, $password);
+            $user->setPassword($hashedPassword);
+
+            // Optionnel : Effacer le token après utilisation
+            $user->setResetToken(null);
+
+            $this->entityManager->flush();
+
+            // 5. Ajouter un message de succès et rediriger
+            $this->addFlash('success', 'Votre mot de passe a été réinitialisé avec succès. Connectez-vous !');
+            return $this->redirectToRoute('app_login');
+        }
+
+        // 6. Afficher le formulaire de réinitialisation
         return $this->render('auth/reset.html.twig', [
-            'controller_name' => 'AuthController',
+            'token' => $token
         ]);
     }
 
@@ -80,7 +126,7 @@ class AuthController extends AbstractController
         return $this->render('auth/forgot.html.twig');
     }
 
-    #[Route('/confirm', name: 'app_reset')]
+    #[Route('/confirm', name: 'app_confirm')]
     public function confirm(): Response
     {
         return $this->render('auth/confirm.html.twig', [
